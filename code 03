@@ -60,9 +60,12 @@ class Player(sprite.Sprite):
         self.y_speed = 0
         
  # метод "постріл" (використовуємо місце гравця, щоб створити там кулю)
+    
     def fire(self):
-        bullet = Bullet('пуля,обріз.png', self.rect.centerx, self.rect.top, 30, 10, 15)
-        bullets.add(bullet)
+        if self.position == 0:
+            bullets.add(Bullet('пуля,обріз.png', self.rect.right, self.rect.centery, 40, 30, 20))
+        elif self.position == 1:
+            bullets.add(Bullet('пуля,обріз.png', self.rect.left, self.rect.centery, 40, 30, -20)) 
     def draw(self):
         if self.position == 0:
             window.blit(self.image,(self.rect.x,self.rect.y))
@@ -70,7 +73,6 @@ class Player(sprite.Sprite):
             window.blit(transform.flip(self.image,True,False),(self.rect.x,self.rect.y))
     def moves(self):
         self.image = transform.scale(image.load(self.pictures[self.move]), [self.w, self.h])
-
 #клас спрайту-ворога
 class Enemy(GameSprite):
     side = "left"
@@ -90,23 +92,7 @@ class Enemy(GameSprite):
         else:
             self.rect.x += self.speed
 
-class Enemy2(GameSprite):
-    side = "left"
-    def __init__(self, player_image, player_x, player_y, size_x, size_y, player_speed):
-        # Викликаємо конструктор класу (Sprite):
-        GameSprite.__init__(self, player_image, player_x, player_y, size_x, size_y)
-        self.speed = player_speed
 
-   #рух ворога
-    def update(self):
-        if self.rect.y <= 40: 
-            self.side = "right"
-        if self.rect.y >= win_height - 390:
-            self.side = "left"
-        if self.side == "left":
-            self.rect.y -= self.speed
-        else:
-            self.rect.y += self.speed
 
 class Enemy3(GameSprite):
     side = "left"
@@ -187,15 +173,76 @@ animation = 0
 
 
 #barrier.add(w1)
-camerman = Player(Walk_Right, 90, 103, 100, 500, 0, 0, 0, 0)
+camerman = Player(Walk_Right, 150, 200, 100, 500, 0, 0, 0, 0)
 #створюємо спрайти
-monster1 = Enemy('бутиль.png', 650, 0, 50, 100, 0)#верхній
+monster1 = Enemy('бутиль.png', 250, 60, 50, 100, 0)#верхній
 final_sprite = GameSprite('двері 1.png',1285 , 610, 100, 150)
 monsters.add(monster1)
 #змінна, що відповідає за те, як закінчилася гра
 finish = False
 #ігровий цикл
 run = True
+while back2 = ACTIVEEVENT:# сподівюся це слово означає актиний
+    back2 = transform.scale(image.load('головна вулиця.png'), (1400, 800))
+    camerman = Player(Walk_Right,150, 200, 50, 750, 0, 0, 0, 0)
+    class Enemy2(GameSprite):
+    side = "left"
+    def __init__(self, player_image, player_x, player_y, size_x, size_y, player_speed):
+        # Викликаємо конструктор класу (Sprite):
+        GameSprite.__init__(self, player_image, player_x, player_y, size_x, size_y)
+        self.speed = player_speed
+
+   #рух ворога
+    def update(self):
+        if self.rect.y <= 40: 
+            self.side = "right"
+        if self.rect.y >= win_height - 390:
+            self.side = "left"
+        if self.side == "left":
+            self.rect.y -= self.speed
+        else:
+            self.rect.y += self.speed
+
+
+
+current_back = None
+def switch_back(back):
+    global current_back
+    current_back = back
+
+def back():
+    run = True
+    while run:
+        for e in pygame.event.get():
+            if e.type == pygame.QUIT:
+                run = False
+                switch_back(None)
+            elif e.type == sprite.groupcollide(camerman, final_sprite):
+                switch_back(back2)
+                run = False
+
+        back.fill('кактус.png',1400, 800)
+        pygame.display.flip()
+
+
+def back2():
+    run = True
+    while run:
+        for e in pygame.event.get():
+            if e.type == pygame.QUIT:
+                run = False   
+            elif e.type == sprite.groupcollide(camerman, final_sprite2):#final_sprite2 це перехід з другого рівня на третій
+                    switch_back(back2)
+                    run = False 
+        back.fill('наступна сцена',1400, 800)
+        pygame.display.flip()
+
+pygame.display.flip()
+
+switch_back(back)
+while current_back in not None:
+    current_back()
+
 while run:
     for e in event.get():
         if e.type == QUIT:
